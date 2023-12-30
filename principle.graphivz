@@ -1,0 +1,32 @@
+digraph G {
+
+  subgraph cluster_1 {
+    node [style=filled];
+    label = "build vm/instance image";
+    create_image_script -> image_created [ label="packer"];
+    color = "red";
+  }
+
+  subgraph cluster_2 {
+    node [style=filled];
+    dockerFile -> oci_image [label= "docker build"];
+    label = "build container image";
+    color = "red";
+  }
+  
+  subgraph cluster_3 {
+    node [style=filled];
+    start_instance -> instace_running_with_nomad [label= "terraform"];
+    instace_running_with_nomad -> instance_with_container_running [ label ="after boot"];
+    label = "Infra";
+    color = "green";
+  }
+  
+  start -> create_image_script;
+  start -> dockerFile;
+  image_created -> start_instance;
+  oci_image -> instance_with_container_running;
+  
+  start [shape=Mdiamond];
+  end [shape=Msquare];
+}
